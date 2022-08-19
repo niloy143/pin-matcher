@@ -3,6 +3,9 @@ const displayPin = document.getElementById('display-pin');
 const pinInputField = document.getElementById('pin-input-field');
 const successNotification = document.getElementById('success-notification');
 const failureNotification = document.getElementById('failure-notification');
+const scammerDetected = document.getElementById('scammer-detected');
+const trial = document.getElementById('trial');
+let trialLeft;
 
 // generating 4 digit random PIN
 function generatePin() {
@@ -16,6 +19,11 @@ function generatePin() {
 // Generate PIN button event handler
 document.getElementById('generate-pin').addEventListener('click', function () {
     displayPin.value = generatePin();
+    pinInputField.value = '';
+    trial.innerText = '3';
+    successNotification.style.display = 'none';
+    failureNotification.style.display = 'none';
+    scammerDetected.style.display = 'none';
 });
 
 // ============================================
@@ -36,32 +44,34 @@ function sliceLastIndex() {
     pinInputField.value = inputValue.slice(0, inputValue.length - 1);
 }
 
-/* document.getElementById('buttons-body').addEventListener('click', function (event) {
-    const buttonValue = event.target.innerText;
-    const pinInputField = document.getElementById('pin-input-field');
-    pinInputField.value += buttonValue;
-    if (buttonValue === 'C') {
-        pinInputField.value = '';
-    }
-    else if (buttonValue === '<') {
-        const pinValue = pinInputField.value;
-        pinInputField.value = pinValue.slice(0, pinValue.length - 2); // cutting last 2 index as '<' is always the last index.
-    }
-}); */
-
 // =======================================================
 
 // submit button Event Handler 
 function submitButton() {
-    const generatedPin = displayPin.value;
-    const enteredPin = pinInputField.value;
+    if (pinInputField.value !== '' && displayPin.value !== '') {
+        const generatedPin = displayPin.value;
+        const enteredPin = pinInputField.value;
+        trialLeft = parseInt(trial.innerText)
 
-    if (generatedPin === enteredPin) {
-        successNotification.style.display = 'block';
-        failureNotification.style.display = 'none';
+        if (generatedPin === enteredPin) {
+            successNotification.style.display = 'block';
+            failureNotification.style.display = 'none';
+            displayPin.value = '';
+        }
+        else {
+            trialLeft--;
+            successNotification.style.display = 'none';
+            failureNotification.style.display = 'block';
+            trial.innerText = trialLeft;
+            if (trialLeft === 0) {
+                displayPin.value = '';
+                pinInputField.value = '';
+                scammerDetected.style.display = 'block';
+                failureNotification.style.display = 'none';
+            }
+        }
+
+        pinInputField.value = '';
     }
-    else {
-        successNotification.style.display = 'none';
-        failureNotification.style.display = 'block';
-    }
+
 }
